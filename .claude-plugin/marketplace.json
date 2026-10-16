@@ -1,0 +1,14 @@
+{
+  "name": "pcbkit",
+  "description": "PCBKit: design printed circuit boards with your agent.",
+  "owner": {
+    "name": "PCBKit",
+    "email": "support@pcbkit.io"
+  },
+  "plugins": [
+    {
+      "name": "pcbkit",
+      "source": "./"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "pcbkit",
+  "displayName": "PCBKit",
+  "version": "0.1.0",
+  "description": "Design printed circuit boards with your agent: describe the board, PCBKit writes it in its board language, checks it, places and routes the copper, and exports fabrication and KiCad files.",
+  "author": {
+    "name": "PCBKit",
+    "email": "support@pcbkit.io",
+    "url": "https://pcbkit.io"
+  },
+  "homepage": "https://pcbkit.io",
+  "repository": "https://github.com/seralexeev/pcbkit-plugin",
+  "license": "LicenseRef-Proprietary",
+  "keywords": ["pcb", "circuit-board", "electronics", "hardware", "routing", "kicad", "gerber"],
+  "icon": "./assets/logo.png",
+  "documentationUrl": "https://pcbkit.io/agents.md",
+  "supportUrl": "https://pcbkit.io/support",
+  "privacyPolicyUrl": "https://pcbkit.io/privacy",
+  "termsOfServiceUrl": "https://pcbkit.io/terms"
+}
