@@ -1,7 +1,7 @@
 {
   "name": "pcbkit",
   "displayName": "PCBKit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Design printed circuit boards with your agent: describe the board, PCBKit writes it in its board language, checks it, places and routes the copper, and exports fabrication and KiCad files.",
   "author": {
     "name": "PCBKit",

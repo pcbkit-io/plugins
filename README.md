@@ -24,6 +24,11 @@ claude plugin install pcbkit@pcbkit
 
 Then ask: "Make a board with an LED that blinks every 2 seconds."
 
+In Claude the board opens in the conversation as an interactive app (PCBKit's own renderer, 2D
+and 3D, in Claude's colours): look at it, select and move parts, route it, play its tour, share it
+by link, or go fullscreen for the whole editor; the menu lists your boards and asks Claude to fix
+what the check finds.
+
 ## What it contains
 
 - `.mcp.json`: the PCBKit MCP server, `https://mcp.pcbkit.io/mcp` (remote, streamable HTTP).
@@ -32,7 +37,7 @@ Then ask: "Make a board with an LED that blinks every 2 seconds."
 
 The plugin runs nothing on your computer. The tools run on PCBKit's servers: the board's files
 and the requests you make through the tools are sent to `mcp.pcbkit.io`, where the boards are kept
-(one per conversation; signed-in boards with your account) and exports are kept as download links
+(one per conversation, more with `project.new`; signed-in boards with your account) and exports are kept as download links
 for 7 days. No account is needed to start. See the [privacy policy](https://pcbkit.io/privacy) and
 the [terms](https://pcbkit.io/terms).
 
