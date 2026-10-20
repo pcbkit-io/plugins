@@ -9,7 +9,7 @@
     "url": "https://pcbkit.io"
   },
   "homepage": "https://pcbkit.io",
-  "repository": "https://github.com/seralexeev/pcbkit-plugin",
+  "repository": "https://github.com/seralexeev/pcbkit-plugins",
   "license": "LicenseRef-Proprietary",
   "keywords": [
     "pcb",

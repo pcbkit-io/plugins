@@ -1,0 +1,55 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "pcbkit",
+  "version": "0.2.2",
+  "description": "Design printed circuit boards with your agent: describe the board, PCBKit writes it in its board language, checks it, places and routes the copper, and exports fabrication and KiCad files.",
+  "author": {
+    "name": "PCBKit",
+    "email": "support@pcbkit.io",
+    "url": "https://pcbkit.io"
+  },
+  "homepage": "https://pcbkit.io",
+  "repository": "https://github.com/seralexeev/pcbkit-plugins",
+  "license": "LicenseRef-Proprietary",
+  "keywords": [
+    "pcb",
+    "circuit board",
+    "electronics",
+    "hardware",
+    "routing",
+    "kicad",
+    "gerber"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "PCBKit",
+        "shortDescription": "Design circuit boards",
+        "longDescription": "PCBKit designs printed circuit boards with you. Describe what the board should do — \"a USB-C powered sensor node with an ESP32 and a temperature sensor\" — and it is written in PCBKit, a small board language with real units, built from proven circuit blocks (regulators, USB, microcontroller support, protection). PCBKit checks the design (electrical rules, clearances, the fab's limits), places the parts, routes the copper and fills the pours, then exports Gerber and drill files with the bill of materials and placement list for the fab, or a KiCad board to continue in KiCad. Ask for changes in plain words (\"move the connector to the left edge\", \"make the power tracks wider\") and it changes the board and routes it again.\n\nWorks without an account: each conversation keeps one board you improve step by step, shown beside the conversation where you can edit and route it too. Sign in to keep your boards with your account and list them. Exported files are download links kept for 7 days.\n\nLimits: two-sided and multilayer boards of everyday size and density; very large or high-speed boards may not route completely, and PCBKit says which connections are missing. Review every design before you order it.",
+        "developerName": "PCBKit",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Design circuit boards",
+          "Check electrical rules",
+          "Place and route",
+          "Export Gerber and KiCad files"
+        ],
+        "websiteURL": "https://pcbkit.io",
+        "supportURL": "https://pcbkit.io/support",
+        "privacyPolicyURL": "https://pcbkit.io/privacy",
+        "termsOfServiceURL": "https://pcbkit.io/terms",
+        "defaultPrompt": [
+          "Make a board with an LED that blinks every 2 seconds.",
+          "Make a breakout board for a BME280 sensor with a Qwiic connector.",
+          "Write my name on my board and route it again."
+        ],
+        "brandColor": "#0A5BF0",
+        "brandColorDark": "#4C8DFF",
+        "composerIcon": "./assets/composer-icon.svg",
+        "logo": "./assets/logo.png",
+        "logoDark": "./assets/logo-dark.png"
+      },
+      "onboardingSkill": "./skills/setup/SKILL.md"
+    }
+  }
+}

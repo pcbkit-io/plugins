@@ -1,12 +1,16 @@
 ---
 name: pcbkit-boards
-description: Design, change, check, route, share and export printed circuit boards (PCBs) with PCBKit. Use when the person asks for a circuit board, a PCB, a blinking LED, a breakout or carrier board, or to change, move, label, route, check, share or export one for fabrication or KiCad.
+description: Design, change, check, route, share and export printed circuit boards (PCBs) with PCBKit. Use when the person asks for a circuit board, a PCB, a blinking LED, a breakout or carrier board, or to change, move, label, route, check, share or export one for fabrication or KiCad; also firmware, sensor, battery and circuit simulation supported by PCBKit.
 ---
 
 # Circuit boards with PCBKit
 
 PCBKit's tools write a board in PCBKit (a small board language with units), check it, place and
 route it, and export it. The person sees the board beside the conversation and watches it change.
+
+## Simulation requests
+
+For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physical circuit/board simulation, read `help { topic: "simulation" }` first. Follow its tool-only workflow and inspect the actual results. Author C through `files.write` / `lab.run { source }`; require the compiler result `ok:true` and fault-free engine snapshots. `lab.simulate` executes a complete reproducible experiment without a live page. Live `lab.*` actions reach the open board page through MCP; the compiler must be configured there. Never infer executable device support from the parts catalog, claim a failed build ran, or replace unread simulation results with invented values. The illustrative laboratory is a functional POC and is not a fabrication-ready board. For a simulation request, start with that workflow instead of routing a new board.
 
 ## The loop
 
@@ -50,6 +54,40 @@ route it, and export it. The person sees the board beside the conversation and w
    `error` findings (each has its `fix`), mention the `warning` ones that are the person's choice.
    Every number in a design or an answer (an LED's resistor, a 555's timing, battery life, a
    divider, a current-sense scale, a track's width) comes from the `calc.*` tools (`calc.led`, `calc.divider`, `calc.astable555`, …), never from your head.
+   For heat or simulation, record the person's operating conditions in the board: an external
+   load belongs on its supply net (`net V3 { voltage = 3.3V; current = 100mA }` for that stated
+   load). A maximum current rating is not an operating load. Inspect `analysis.models`, then
+   `analysis.run { lens: "heat" }`; if sources or loads are missing, supply the conditions the
+   person already gave and run it again. Without them, temperatures remain unknown. Use the
+   returned temperatures and assumptions; convergence does not prove physical accuracy. A
+   JEDEC junction-to-ambient resistance is not the custom board's resistance, and there is no
+   universal temperature offset for a closed box. The result's junction temperature includes
+   the board temperature plus the package rise; a measured case temperature is a different
+   quantity and cannot be compared directly to a junction limit. Explain missing data without declaring the
+   board safe. `analysis.circuit`, `analysis.ac` and `analysis.transient` require explicit device
+   models; they do not infer a whole-chip model from a part number. `mosfetChannel` is only a
+   long-channel equation without intrinsic charge or body junctions. Do not assign it to a
+   named transistor from its ratings or use it alone to claim real switching speed/loss.
+   For a passive circuit, `analysis.netlist` assembles the board's typed nominal R/C/L values
+   and explicit named-net sources; pass its returned `circuit` to the chosen solver. If it is
+   null, resolve the missing models or conditions. Do not silently exclude unsupported parts.
+   A requested component selection is a partial circuit: explain the excluded boundary loads
+   and do not present its answer as a simulation of the whole board.
+   Read AC answers from `samples`; use `observe` with the wanted voltage node or current device
+   (at most eight). Large raw arrays live in the artifact URL, not in the editable board's
+   files. Do not replace unread solver numbers with hand calculations. Do not volunteer an
+   RC corner or thermal margin before a calculation supports it.
+   Defaults, including 25 °C ambient, are assumptions, not conditions supplied by the person.
+   Do not derive an enclosure's allowable ambient by subtracting the board or chip temperature
+   from a limit: cooling inside the enclosure has not been modelled. Recommend checking the
+   actual assembly under its stated load. A lower controlled supply or a suitable switching
+   regulator can reduce LDO loss; a series input resistor is not a substitute for a regulated
+   input and needs its own load-range/dropout analysis before it can be recommended.
+   A physical `analysis.dcir` or `analysis.electrothermal` calculation returns compact diagnostics
+   and `artifact.url` for its saved fields. Show them with `view.simulation.open` using that URL,
+   a copper layer and the desired metric; use its returned page-local job id for subsequent
+   `view.simulation` changes. The compute call's job id belongs to another process. A saved
+   field is valid only for its exact board geometry; opening it does not rerun the solver.
 7. **Export only when asked:** fabrication or KiCad files (`export.fab`, `export.kicad`) when the
    person asks for them or orders, not after a change; the board beside the conversation is enough.
 8. **Share when asked** ("send it to a friend", "a link"): `share.link`, then give the person its
