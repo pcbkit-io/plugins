@@ -109,10 +109,13 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    (layers, thickness, finish, mask, quantity, assembly sides) and what to check in the
    assembler's preview (pin 1 of each IC, parts on the bottom).
    **To order the bare board** ("order it", "where can I make it", "how much"): `fab.shops` lists
-   the fabs with an estimate where one publishes prices and what each cannot make of this design;
-   when the person picks one, `fab.order { shop }` puts the board on that fab's order page and gives
-   its `url`: hand it to the person, who chooses the options, pays and orders there (PCBKit sells
-   nothing). A fab with `how: page` gives its quote page and the archive to upload.
+   the fabs with an estimate where one publishes prices, what each cannot make of this design
+   (`limits`), which of the board's options (`board.fab`: colours, finish, thickness, …) its page
+   gets chosen already (`filled`) and which the person chooses there by hand (`manual`). Set the
+   options the person wants with `board.fab` first. When the person picks a fab,
+   `fab.order { shop }` puts the board on that fab's order page and gives its `url`: hand it to the
+   person, who checks the options, pays and orders there (PCBKit sells nothing). A fab with
+   `how: page` gives its quote page and the archive to upload.
 8. **Share when asked** ("send it to a friend", "a link"): `share.link`, then give the person its
    `url`: anyone opens it without an account, read-only, with the board's AI tour first, and it
    follows every later change; a friend's edits go to their own copy. `share.stop` closes it.
