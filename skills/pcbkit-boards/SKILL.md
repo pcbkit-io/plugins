@@ -14,8 +14,14 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
 
 ## The loop
 
+0. **Build, or ask once.** When the person says what to build, build it now: choose defaults for
+   what they left out and say them in the answer. Ask first only when the device itself is
+   undecided (a "motor controller" with no motor named, a "gadget" with no idea): one short
+   message with the two or three questions that change the design, each with the default you
+   would take. Once they answer or describe the device, build it; a choice still open is a
+   default you state, never another question before the board.
 1. **First design at once.** Choose sensible defaults for what the person did not say (power, size)
-   and write the whole first design in one `files.write { path: "design.pcbkit", text, build: true }`:
+   and write the whole first design in one `files.write { path: ".pcbkit/design.pcbkit", text, build: true }`:
    blocks and parts joined by nets, no coordinates; `build: true` places and routes it in the same
    call. `help { topic: "quickstart" }` has a complete first board and lists every block and the
    registry's parts: describe all you use in one call (`blocks.describe { names: [...] }`,
@@ -47,7 +53,13 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    to see (2D or 3D, a layer, the code) the `view.*` tools do on their open board.
    A wish about where a part goes is a rule, not coordinates: "in the middle" `place =
    [area(.centre)]`, "top right" `[area(.topRight)]` (a corner holds a mounting hole: use `area`),
-   "on the left edge" `[edge(.left)]`; it stays true when the board changes.
+   "on the left edge" `[edge(.left)]`; it stays true when the board changes. Parts a person
+   sees or touches as a set (a light's LEDs, keys, a display's digits, test points) get an
+   arrangement: `row([...])`, `column([...])` or `grid([...], columns = 3, pitch = 8mm)`. A decoupling
+   capacitor or a pull-up goes at the pin it serves: `place = [near(U1.pin.AVDD)]`. Give `at`
+   only to what the person fixes mechanically (a sensor's position, a connector, holes). The
+   router stitches a net's pours on both layers with vias by itself, and references with no
+   room on the silkscreen are left out by themselves: neither needs a workaround.
 6. **Review before "ready", compute nothing in your head.** Before you call a board ready or
    export it: `analysis.run { lens: "ready" }`, the design review (connectors on edges, decoupling, LED currents,
    programming access, protection, sensors near heat, antennas, holes, silkscreen); fix its
@@ -90,11 +102,24 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    field is valid only for its exact board geometry; opening it does not rerun the solver.
 7. **Export only when asked:** fabrication or KiCad files (`export.fab`, `export.kicad`) when the
    person asks for them or orders, not after a change; the board beside the conversation is enough.
+   An order with assembly: `parts.select` first; part numbers the person gives go in as fields
+   (`fields { "LCSC": "C25744" }`). Where no part can be chosen (the catalog not connected), still
+   `export.fab { force: true }`: the BOM carries each part's value, footprint and MPN, which the
+   assembler matches itself; name the lines without a part number. Then the order settings
+   (layers, thickness, finish, mask, quantity, assembly sides) and what to check in the
+   assembler's preview (pin 1 of each IC, parts on the bottom).
+   **To order the bare board** ("order it", "where can I make it", "how much"): `fab.shops` lists
+   the fabs with an estimate where one publishes prices and what each cannot make of this design;
+   when the person picks one, `fab.order { shop }` puts the board on that fab's order page and gives
+   its `url`: hand it to the person, who chooses the options, pays and orders there (PCBKit sells
+   nothing). A fab with `how: page` gives its quote page and the archive to upload.
 8. **Share when asked** ("send it to a friend", "a link"): `share.link`, then give the person its
    `url`: anyone opens it without an account, read-only, with the board's AI tour first, and it
    follows every later change; a friend's edits go to their own copy. `share.stop` closes it.
 9. **Text on the board** goes on the top silkscreen (`Silk.top`) unless the person asks for the
-   back, where nothing else is printed; `check.run` warns (`silk-overlap`) when it is not.
+   back, where nothing else is printed; `check.run` warns (`silk-overlap`) when it is not. A
+   label of a part (a connector's `IN 12V`, `+`/`-`, a switch's `ON`) is `Text { text = "IN 12V";
+   near = J1 }` without `at`: it stays beside the part wherever the part goes.
 
 ## Read what the step needs
 
