@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "pcbkit",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Design printed circuit boards with your agent: describe the board, PCBKit writes it in its board language, checks it, places and routes the copper, and exports fabrication and KiCad files.",
   "author": {
     "name": "PCBKit",

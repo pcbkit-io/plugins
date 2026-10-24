@@ -8,9 +8,22 @@ description: Design, change, check, route, share and export printed circuit boar
 PCBKit's tools write a board in PCBKit (a small board language with units), check it, place and
 route it, and export it. The person sees the board beside the conversation and watches it change.
 
-## Simulation requests
+## Devices that run
 
-For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physical circuit/board simulation, read `help { topic: "simulation" }` first. Follow its tool-only workflow and inspect the actual results. Author C through `files.write` / `lab.run { source }`; require the compiler result `ok:true` and fault-free engine snapshots. `lab.simulate` executes a complete reproducible experiment without a live page. Live `lab.*` actions reach the open board page through MCP; the compiler must be configured there. Never infer executable device support from the parts catalog, claim a failed build ran, or replace unread simulation results with invented values. The illustrative laboratory is a functional POC and is not a fabrication-ready board. For a simulation request, start with that workflow instead of routing a new board.
+A device with a program (a game, a timer, a sensor display, a controller) is one board that runs
+in the simulator and can be ordered and flashed as it is. Read `help { topic: "simulation" }`
+first. Choose the processor, display, controls and power from `lab.catalog`'s orderable `parts`
+and say why in a line each (what the program needs, what the person asked, how it is flashed:
+an Arduino Nano's USB, an RP2040/RP2350's BOOTSEL); a battery device needs its cell on a
+connector, a charger from USB, a switch and the processor's supply. Design and route it until
+`check` is complete, write the program into the folder the processor names (`files.write`), build
+it with `lab.run` (require `ok:true`, read the diagnostics), look at its screen (`lab.frame`),
+press its buttons (`lab.control`, `lab.advance`) and report what the snapshots show — never what
+the code should do. Finish as for any board: `parts.select` until every part has an orderable
+part, `export.run { format: "firmware" }` and the fabrication files or `fab.order`, and tell the
+person in plain steps how to order it, charge it and flash the ordered board. `lab.simulate`
+runs a reproducible experiment without a page; live `lab.*` commands act on the board the person
+has open. Never claim a failed build ran or invent readings.
 
 ## The loop
 
@@ -24,7 +37,7 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    and write the whole first design in one `files.write { path: ".pcbkit/design.pcbkit", text, build: true }`:
    blocks and parts joined by nets, no coordinates; `build: true` places and routes it in the same
    call. `help { topic: "quickstart" }` has a complete first board and lists every block and the
-   registry's parts: describe all you use in one call (`blocks.describe { names: [...] }`,
+   registry's parts: describe all you use in one call (`lang.describe { ids: [...] }`,
    `parts.use { ids: [...] }`, whose `design` is the file's text: no need to read it). Leave the outline to the engine
    (it sizes it around the parts and rounds its corners) and give the board
    `holes = MountingHoles() {}` (a plated M3 hole in each corner) unless the person says
@@ -37,7 +50,7 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    for the person and follows every later change by itself, theirs included. Never call it again:
    each call adds another copy of the board to the conversation.
 3. **Fix:** the build's answer spells out the first errors and what to do about each; fix them
-   with `files.edit { …, build: true }` (change and build in one call; `report.get` only when it
+   with `files.edit { …, build: true }` (change and build in one call; `check.run` only when it
    says there are more). `build.run { all: true }` places and routes everything anew, no
    `route.clear` first. The first time the board checks complete, `view.tour`: a
    short camera tour for the person (it plays once and comes back to the whole board).
@@ -48,15 +61,15 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    two or three next steps that fit (`help { topic: "guide" }` has the ladder: make it theirs,
    move things, add features, make it sturdy, grow it, order it).
 5. **Each further request is one small change** (`files.edit`, `board.move`, … with `build: true`,
-   which routes again in the same call; else `route.run`), and the same short report. The person's view goes to the parts you changed by
-   itself; for anything else (a new text, a net) `view.focus { ids: [...] }`. What the person asks
+   which routes again in the same call; else `build.run`), and the same short report. The person's view goes to the parts you changed by
+   itself; for anything else (a new text, a net) `view.camera { ids: [...] }`. What the person asks
    to see (2D or 3D, a layer, the code) the `view.*` tools do on their open board.
    A wish about where a part goes is a rule, not coordinates: "in the middle" `place =
-   [area(.centre)]`, "top right" `[area(.topRight)]` (a corner holds a mounting hole: use `area`),
+   [area(.center)]`, "top right" `[area(.topRight)]` (a corner holds a mounting hole: use `area`),
    "on the left edge" `[edge(.left)]`; it stays true when the board changes. Parts a person
    sees or touches as a set (a light's LEDs, keys, a display's digits, test points) get an
    arrangement: `row([...])`, `column([...])` or `grid([...], columns = 3, pitch = 8mm)`. A decoupling
-   capacitor or a pull-up goes at the pin it serves: `place = [near(U1.pin.AVDD)]`. Give `at`
+   capacitor or a pull-up goes at the pin it serves: `place = [near(U1.pin.AVDD, max = 2mm)]`. Give `at`
    only to what the person fixes mechanically (a sensor's position, a connector, holes). The
    router stitches a net's pours on both layers with vias by itself, and references with no
    room on the silkscreen are left out by themselves: neither needs a workaround.
@@ -65,10 +78,13 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    programming access, protection, sensors near heat, antennas, holes, silkscreen); fix its
    `error` findings (each has its `fix`), mention the `warning` ones that are the person's choice.
    Every number in a design or an answer (an LED's resistor, a 555's timing, battery life, a
-   divider, a current-sense scale, a track's width) comes from the `calc.*` tools (`calc.led`, `calc.divider`, `calc.astable555`, …), never from your head.
+   divider, a current-sense scale, a track's width) comes from `calc.run` (`kind`: `led`, `divider`, `astable555`, …, with its `params`: `help { command: "calc.run" }`), never from your head.
+   An antenna feed (50 Ω) or a USB / Ethernet pair (90 / 100 Ω) states its impedance and the
+   router sizes it from the board's stack: `net ANT { impedance = 50ohm }`, `pair ETH_TX = (TXP,
+   TXN) { impedance = 100ohm }` (`calc.run { kind: "impedance" }` shows the numbers); on two layers say that the line is wide.
    For heat or simulation, record the person's operating conditions in the board: an external
    load belongs on its supply net (`net V3 { voltage = 3.3V; current = 100mA }` for that stated
-   load). A maximum current rating is not an operating load. Inspect `analysis.models`, then
+   load). A maximum current rating is not an operating load. Inspect `analysis.inputs { parts: true }`, then
    `analysis.run { lens: "heat" }`; if sources or loads are missing, supply the conditions the
    person already gave and run it again. Without them, temperatures remain unknown. Use the
    returned temperatures and assumptions; convergence does not prove physical accuracy. A
@@ -76,10 +92,10 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    universal temperature offset for a closed box. The result's junction temperature includes
    the board temperature plus the package rise; a measured case temperature is a different
    quantity and cannot be compared directly to a junction limit. Explain missing data without declaring the
-   board safe. `analysis.circuit`, `analysis.ac` and `analysis.transient` require explicit device
-   models; they do not infer a whole-chip model from a part number. `mosfetChannel` is only a
-   long-channel equation without intrinsic charge or body junctions. Do not assign it to a
-   named transistor from its ratings or use it alone to claim real switching speed/loss.
+   board safe. `analysis.circuit` (dc, ac or transient) requires explicit device
+   models; they do not infer a whole-chip model from a part number. `mosfetChannel` is a
+   long-channel equation (with an optional body effect) without intrinsic gate charge. Do not assign
+   it to a named transistor from its ratings or use it alone to claim real switching speed/loss.
    For a passive circuit, `analysis.netlist` assembles the board's typed nominal R/C/L values
    and explicit named-net sources; pass its returned `circuit` to the chosen solver. If it is
    null, resolve the missing models or conditions. Do not silently exclude unsupported parts.
@@ -96,30 +112,45 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
    regulator can reduce LDO loss; a series input resistor is not a substitute for a regulated
    input and needs its own load-range/dropout analysis before it can be recommended.
    A physical `analysis.dcir` or `analysis.electrothermal` calculation returns compact diagnostics
-   and `artifact.url` for its saved fields. Show them with `view.simulation.open` using that URL,
-   a copper layer and the desired metric; use its returned page-local job id for subsequent
-   `view.simulation` changes. The compute call's job id belongs to another process. A saved
+   and `artifact.url` for its saved fields. Show them with `view.analysis { url, layer, metric }`
+   using that URL; use the page-local job id it returns for subsequent
+   `view.analysis { id, layer, metric }` changes. The compute call's job id belongs to another process. A saved
    field is valid only for its exact board geometry; opening it does not rerun the solver.
-7. **Export only when asked:** fabrication or KiCad files (`export.fab`, `export.kicad`) when the
+   For anything the lenses do not answer, run an analysis script (`analysis.script`, its API in
+   `help { topic: "analysis" }`): it reads the board, calls the solvers and reports a lens shown on
+   the board. A template answers the usual questions — `impedance` (are the traces their target
+   impedance), `eye` (does a link work at a bit rate; `equalize: "auto"` trains FFE/CTLE/DFE),
+   `reflections` (ringing, a series resistor; an IBIS model when the person has one), `crosstalk`,
+   `returnpath` (gaps under signals, unstitched layer changes), `emissions`, `pdn` (rail impedance
+   against its target), `planes` (plane resonances), `load` (a rail's dip when a load's current
+   jumps), `converter` (a buck's ripple, peak against the inductor's saturation, efficiency, loop
+   and compensation), `heatup`, `response` (a filter's Bode plot), `tolerance` (Monte Carlo yield).
+   Each declares its inputs (the answer's `controls`, with their values): run it again with
+   `inputs` for the person's conditions — `{ template: "load", inputs: { rail: "+3V3", load: {
+   shape: "pulse", base: 0.05, peak: 0.4, width: 1e-3, period: 4e-3 } } }` for a radio's bursts.
+   Write your own script for anything else (a sweep, a custom plot), keep a board's own checks as
+   `.pcbkit/analysis/<name>.js`, and quote what the script reports: its numbers with their
+   conditions, where on the board (coordinates and the nearest part), the component values it
+   read or designed (compensation, taps), and its assumptions.
+7. **Export only when asked:** fabrication or KiCad files (`export.run { format: "fab" }` or
+   `{ format: "kicad" }`) when the
    person asks for them or orders, not after a change; the board beside the conversation is enough.
    **To order** ("order it", "where can I make it", "how much", "10 assembled"): `fab.shops` lists
    the fabs with an estimate where one publishes prices, what each cannot make of this design
-   (`limits`), which of the board's options (`board.fab`: colours, finish, thickness, …) its page
+   (`limits`), which of the board's fabrication options (colours, finish, thickness, …) its page
    gets chosen already (`filled`) and which the person chooses there by hand (`manual`). Set the
-   options the person wants with `board.fab` first. When the person picks a fab,
+   options the person wants with `fab.options` first. When the person picks a fab,
    `fab.order { shop }` puts the board on that fab's order page and gives its `url`: hand it to the
    person, who checks the options, pays and orders there (PCBKit sells nothing). A fab with
    `how: page` gives its quote page and the archive to upload. **Assembled (PCBA):**
    `fab.order { shop, assembly: true }` where the fab's `assembly` is set: `upload` (PCBWay,
    AISLER) sends the BOM and positions in the fab's own format with the board and the fab buys
-   the parts by MPN, so first fill the MPNs (`parts.select`; `fab.shops`' `assembly.withoutMpn`
+   the parts by MPN, so first fill the MPNs (`parts.select`; `fab.shops`' `assembly.without_mpn`
    names the parts without one); `page` (JLCPCB, NextPCB) gives the BOM and placement list to
-   upload there. Name the bottom-side and through-hole parts: they cost more. Assembled (`assembly: true`): the
-   fab buys each part by its MPN, so every part needs one: `parts.select` where the catalog
-   answers, the person's part numbers as fields (`fields { "MPN": "…", "LCSC": "C25744" }`);
-   `fab.shops`' `assembly.withoutMpn` names the parts still without; say what to check in the
-   fab's placement preview (pin 1 of each IC, parts on the bottom). Files only ("give me the
-   Gerbers"): `export.fab` (`force: true` for a board not complete, said plainly).
+   upload there. The person's own part numbers go in as fields (`fields { "MPN": "…", "LCSC":
+   "C25744" }`). Name the bottom-side and through-hole parts: they cost more; say what to check in
+   the fab's placement preview (pin 1 of each IC, parts on the bottom). Files only ("give me the
+   Gerbers"): `export.run { format: "fab" }` (`force: true` for a board not complete, said plainly).
 8. **Share when asked** ("send it to a friend", "a link"): `share.link`, then give the person its
    `url`: anyone opens it without an account, read-only, with the board's AI tour first, and it
    follows every later change; a friend's edits go to their own copy. `share.stop` closes it.
@@ -135,11 +166,11 @@ For firmware, sensors, a battery-powered instrument, CO₂ indicators, or physic
   (also `Board`, `Fabrication`, `Placement rules`, `Parts and components`, `Routing`, `Errors`,
   `Recipes`).
 - The language: `help { topic: "language", section }`; the standard library: `lang.search`,
-  `lang.describe { name }`.
+  `lang.describe { ids }`.
 - Parts: `parts.search` (verified pin tables), else the datasheet — ask the person for it or find
-  the manufacturer's for the exact part number — into `parts.sheet`, `parts.check`,
+  the manufacturer's for the exact part number — into `parts.sheet`, `parts.create { dry_run: true }`,
   `parts.create`. Never invent pin numbers.
-- A chip comes with its datasheet's support circuit: `parts.use { id }` adds `U1 = <id>.Part {}`
+- A chip comes with its datasheet's support circuit: `parts.use { ids: [id] }` adds `U1 = <id>.Part {}`
   and `U1Support = <id>.Support(U1) {}` (decoupling at every supply pin, bulk capacitors,
   pull-ups, the crystal with its load capacitors, reset/boot buttons, straps, an RP2040's flash).
   Connect the chip's pins in that line, pass the inputs it names (a regulator's `vout`, USB
@@ -162,11 +193,11 @@ the same board. If the person wants to keep their boards, they can sign in.
   `help { topic: "format", section: "Several boards" }` has a whole example.
 - **A board that has nothing to do with the current one:** `project.new { name }` starts it in
   the same conversation; the calls after it go to the new board and the person's view follows.
-  `projects.list` lists the conversation's boards; pass one's id as `project` once to go back.
-- To work on another board the person names, pass its id from `projects.list` once.
+  `project.list` lists the conversation's boards; `project.open { id }` goes back to one.
+- To work on another board the person names, `project.open { id }` with its id from `project.list`.
 
 ## Be honest about the board
 
 The check is not a review (`analysis.run { lens: "ready" }` is): name connections that did not route and why
-(`board.unrouted`, `route.diagnose`), never call a board ready when the check is not `complete`,
+(`route.diagnose`), never call a board ready when the check is not `complete`,
 and ask the person to review the design before ordering.
