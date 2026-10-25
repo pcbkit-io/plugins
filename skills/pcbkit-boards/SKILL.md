@@ -6,7 +6,8 @@ description: Design, change, check, route, share and export printed circuit boar
 # Circuit boards with PCBKit
 
 PCBKit's tools write a board in PCBKit (a small board language with units), check it, place and
-route it, and export it. The person sees the board beside the conversation and watches it change.
+route it, and export it. The person sees the board beside the conversation (in a terminal or an
+IDE: on its live page, a link `board.open` gives) and watches it change.
 
 ## Devices that run
 
@@ -14,12 +15,17 @@ A device with a program (a game, a timer, a sensor display, a controller) is one
 in the simulator and can be ordered and flashed as it is. Read `help { topic: "simulation" }`
 first. Choose the processor, display, controls and power from `lab.catalog`'s orderable `parts`
 and say why in a line each (what the program needs, what the person asked, how it is flashed:
-an Arduino Nano's USB, an RP2040/RP2350's BOOTSEL); a battery device needs its cell on a
+an Arduino Nano's USB, an RP2040/RP2350's BOOTSEL, an STM32's ST-Link or DFU, an ESP32's
+USB-UART); STM32 programs use ST's HAL, ESP32 programs ESP-IDF's low-level drivers, and an ESP32's
+Wi-Fi and Bluetooth do not run here (say so); a battery device needs its cell on a
 connector, a charger from USB, a switch and the processor's supply. Design and route it until
 `check` is complete, write the program into the folder the processor names (`files.write`), build
 it with `lab.run` (require `ok:true`, read the diagnostics), look at its screen (`lab.frame`),
 press its buttons (`lab.control`, `lab.advance`) and report what the snapshots show — never what
-the code should do. Finish as for any board: `parts.select` until every part has an orderable
+the code should do. Without the board open, `lab.run` builds on PCBKit's servers and saves the
+image; then `lab.simulate { steps }` runs it with the inputs you set and returns what the pins,
+serial port and displays did: report those. A processor `lab.catalog` does not list cannot run
+here: say so, still write its program, and offer a listed one or a bench test. Finish as for any board: `parts.select` until every part has an orderable
 part, `export.run { format: "firmware" }` and the fabrication files or `fab.order`, and tell the
 person in plain steps how to order it, charge it and flash the ordered board. `lab.simulate`
 runs a reproducible experiment without a page; live `lab.*` commands act on the board the person
@@ -32,7 +38,9 @@ has open. Never claim a failed build ran or invent readings.
    undecided (a "motor controller" with no motor named, a "gadget" with no idea): one short
    message with the two or three questions that change the design, each with the default you
    would take. Once they answer or describe the device, build it; a choice still open is a
-   default you state, never another question before the board.
+   default you state, never another question before the board. A part that misses one figure
+   (a controller rated 30 W for a 20 W board, a variant to confirm) is the closest one, built in
+   and named in the answer; a chip the registry lacks is read from its datasheet in the same turn.
 1. **First design at once.** Choose sensible defaults for what the person did not say (power, size)
    and write the whole first design in one `files.write { path: ".pcbkit/design.pcbkit", text, build: true }`:
    blocks and parts joined by nets, no coordinates; `build: true` places and routes it in the same
@@ -48,11 +56,17 @@ has open. Never claim a failed build ran or invent readings.
    about 1 s.
 2. **Open it:** `board.open` once per conversation, right after the first design. The board opens
    for the person and follows every later change by itself, theirs included. Never call it again:
-   each call adds another copy of the board to the conversation.
+   each call adds another copy of the board to the conversation. Where the host draws no board (a
+   terminal or an IDE: Codex, Claude Code), its answer is the board's live page: give the person
+   that link in your answer, once; it shows everything you do from then on.
 3. **Fix:** the build's answer spells out the first errors and what to do about each; fix them
    with `files.edit { …, build: true }` (change and build in one call; `check.run` only when it
-   says there are more). `build.run { all: true }` places and routes everything anew, no
-   `route.clear` first. The first time the board checks complete, `view.tour`: a
+   says there are more). A build completes the board: the copper that still matches the design
+   stays and only what is unrouted or broken by the change is routed (copper the tools made
+   themselves may be redone to fix it; a person's, drawn or changed in KiCad or the app, never). When a
+   connection does not fit, ask the person before `build.run { make_room: true }` (routes the
+   copper close around it again) or `build.run { all: true }` (places and routes everything
+   anew, no `route.clear` first): both change routing they may have finished. The first time the board checks complete, `view.tour`: a
    short camera tour for the person (it plays once and comes back to the whole board).
 4. **Report in a sentence or two**, in plain words, by the board's name, never with ids, with the
    numbers that matter (a blinker's on and off times, the board's size); look at the board first
@@ -68,8 +82,13 @@ has open. Never claim a failed build ran or invent readings.
    [area(.center)]`, "top right" `[area(.topRight)]` (a corner holds a mounting hole: use `area`),
    "on the left edge" `[edge(.left)]`; it stays true when the board changes. Parts a person
    sees or touches as a set (a light's LEDs, keys, a display's digits, test points) get an
-   arrangement: `row([...])`, `column([...])` or `grid([...], columns = 3, pitch = 8mm)`. A decoupling
-   capacitor or a pull-up goes at the pin it serves: `place = [near(U1.pin.AVDD, max = 2mm)]`. Give `at`
+   arrangement: `row([...])`, `column([...])` or `grid([...], columns = 3, pitch = 8mm)`. Blocks
+   and part modules already hold their capacitors and pull-ups at the pins they serve (as
+   preferences): keep their rules as they come; one you add goes at its pin the same way,
+   `place = [soft(near(U1.pin.AVDD, max = 2mm), weight = 2)]`. A rule without `soft` is a
+   requirement: each one the engine cannot keep is an error on the board, so require only what
+   must hold (a connector's edge, a sensor away from heat) and leave the rest of the layout to
+   the engine; no `inside(box(…))` per part on a board of a given size. Give `at`
    only to what the person fixes mechanically (a sensor's position, a connector, holes). The
    router stitches a net's pours on both layers with vias by itself, and references with no
    room on the silkscreen are left out by themselves: neither needs a workaround.
@@ -135,7 +154,11 @@ has open. Never claim a failed build ran or invent readings.
 7. **Export only when asked:** fabrication or KiCad files (`export.run { format: "fab" }` or
    `{ format: "kicad" }`) when the
    person asks for them or orders, not after a change; the board beside the conversation is enough.
-   **To order** ("order it", "where can I make it", "how much", "10 assembled"): `fab.shops` lists
+   **To order** ("order it", "where can I make it", "how much", "10 assembled"): when the person
+   asks to order, hand the board over: PCBKit never places an order or takes payment, the fab's page
+   only shows the board, so a missing part number or a warning is something to say, not a reason
+   to refuse. Do not hand over a board whose check is not `complete` (say why and what fixes it).
+   `fab.shops` lists
    the fabs with an estimate where one publishes prices, what each cannot make of this design
    (`limits`), which of the board's fabrication options (colours, finish, thickness, …) its page
    gets chosen already (`filled`) and which the person chooses there by hand (`manual`). Set the
@@ -147,7 +170,8 @@ has open. Never claim a failed build ran or invent readings.
    AISLER) sends the BOM and positions in the fab's own format with the board and the fab buys
    the parts by MPN, so first fill the MPNs (`parts.select`; `fab.shops`' `assembly.without_mpn`
    names the parts without one); `page` (JLCPCB, NextPCB) gives the BOM and placement list to
-   upload there. The person's own part numbers go in as fields (`fields { "MPN": "…", "LCSC":
+   upload there. Parts still without an MPN go to the fab without one: name them in the answer
+   (the fab's page asks for them, or `parts.select` fills them first if the person wants). The person's own part numbers go in as fields (`fields { "MPN": "…", "LCSC":
    "C25744" }`). Name the bottom-side and through-hole parts: they cost more; say what to check in
    the fab's placement preview (pin 1 of each IC, parts on the bottom). Files only ("give me the
    Gerbers"): `export.run { format: "fab" }` (`force: true` for a board not complete, said plainly).
@@ -167,9 +191,11 @@ has open. Never claim a failed build ran or invent readings.
   `Recipes`).
 - The language: `help { topic: "language", section }`; the standard library: `lang.search`,
   `lang.describe { ids }`.
-- Parts: `parts.search` (verified pin tables), else the datasheet — ask the person for it or find
-  the manufacturer's for the exact part number — into `parts.sheet`, `parts.create { dry_run: true }`,
-  `parts.create`. Never invent pin numbers.
+- Parts: `parts.search` (verified pin tables), else the datasheet: `parts.datasheet { id }` reads
+  the maker's PDF (pin table, package drawing, application circuit) — then `parts.sheet`,
+  `parts.create { dry_run: true }`, `parts.create`. A part missing from the registry is one of
+  those calls, not a reason to stop building or to ask the person for the PDF (ask only when the
+  tool cannot read it). Never invent pin numbers.
 - A chip comes with its datasheet's support circuit: `parts.use { ids: [id] }` adds `U1 = <id>.Part {}`
   and `U1Support = <id>.Support(U1) {}` (decoupling at every supply pin, bulk capacitors,
   pull-ups, the crystal with its load capacitors, reset/boot buttons, straps, an RP2040's flash).
