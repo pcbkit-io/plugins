@@ -18,7 +18,7 @@ edge", "make the power tracks wider") and it changes the board and routes it aga
 **Claude Code:**
 
 ```sh
-claude plugin marketplace add seralexeev/pcbkit-plugins
+claude plugin marketplace add pcbkit-io/plugins
 claude plugin install pcbkit@pcbkit
 ```
 
@@ -28,7 +28,7 @@ repository as a marketplace (Admin → Plugins → Import marketplace).
 **Codex:**
 
 ```sh
-codex plugin marketplace add seralexeev/pcbkit-plugins
+codex plugin marketplace add pcbkit-io/plugins
 codex plugin add pcbkit@pcbkit
 ```
 
