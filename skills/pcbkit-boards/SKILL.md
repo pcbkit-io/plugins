@@ -75,6 +75,11 @@ at a time, each told in a sentence.
   power-good drives. A motor driver's supply: reverse polarity by a P-MOSFET (`ReversePolarity`),
   never a series diode (a braking motor pushes energy back into the supply), and its TVS and bulk
   capacitor on the driver's side of it.
+- **A temperature or humidity sensor** goes to a far corner from the radio, the processor and the
+  regulator (`far(U1, min = 15mm)`) on a slotted island without pour
+  (`U3 = thermalIsland(SHT40_AD1B.Part) { … }`); judge its warming with the heat lens at the
+  device's real duty cycle (a logger that sleeps: each hot part's average `dissipation`), and
+  quote `sensor-warm`'s number.
 - **Labels** go on the top silkscreen beside their part: `inLabel = Text { text = "IN 12V"; near = J1 }`.
 - **Numbers come from `calc.run`**, never from your head: an LED's resistor, a 555's timing (a
   blinker that "blinks every 2 seconds" is on about 1 s, off about 1 s), a divider, battery life,
