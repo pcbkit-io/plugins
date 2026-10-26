@@ -10,6 +10,10 @@
   },
   "homepage": "https://pcbkit.io",
   "repository": "https://github.com/pcbkit-io/plugins",
+  "documentationUrl": "https://pcbkit.io/agents.md",
+  "supportUrl": "https://pcbkit.io/support",
+  "privacyPolicyUrl": "https://pcbkit.io/privacy",
+  "termsOfServiceUrl": "https://pcbkit.io/terms",
   "license": "LicenseRef-Proprietary",
   "keywords": [
     "pcb",
