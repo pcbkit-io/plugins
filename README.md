@@ -25,6 +25,14 @@ claude plugin marketplace add pcbkit-io/plugins && claude plugin install pcbkit@
 codex plugin marketplace add pcbkit-io/plugins && codex plugin add pcbkit@pcbkit
 ```
 
+Then start the agent in your KiCad project's folder, or in an empty folder for a new board
+(`mkdir blinker && cd blinker && claude`, or `codex`). Claude Code asks before each PCBKit tool
+the first time ("Yes, and don't ask again"; or allow them all at once: `"permissions": { "allow":
+["mcp__plugin_pcbkit_pcbkit"] }` in `.claude/settings.json`). Codex runs PCBKit's tools without
+asking (the plugin says so: they act on the project's files on your computer), `codex exec` too.
+If you also added PCBKit to claude.ai, Claude Code lists that connector beside the plugin: the
+plugin's tools are the ones that work on your files.
+
 **Cursor, VS Code, JetBrains, Gemini CLI and other agents**: install the CLI
 (`curl -fsSL https://pcbkit.io/install.sh | sh`) and add the MCP server `pcbkit mcp`; every host's
 line: [pcbkit.io/docs/agent-hosts](https://github.com/pcbkit-io/pcbkit/blob/main/docs/agent-hosts.md).
@@ -52,7 +60,8 @@ links, fab orders.
 
 The first start installs the `pcbkit` release this plugin pins from
 [github.com/pcbkit-io/cli](https://github.com/pcbkit-io/cli) (macOS, Linux; checked against the
-release's SHA-256 sums) into `~/.local/share/pcbkit/cli/<version>/`. `pcbkit` on your PATH at that
+release's SHA-256 sums) into `~/.local/share/pcbkit/cli/<version>/`: about 32 MB, a few seconds,
+once. `pcbkit` on your PATH at that
 version is used as it is; `PCBKIT_BIN` names another binary. Updating the plugin
 (`claude plugin update pcbkit@pcbkit`, `codex plugin add pcbkit@pcbkit`) brings the next release.
 Windows: install `pcbkit` from the releases and use it with an agent that runs in WSL or Git Bash.
