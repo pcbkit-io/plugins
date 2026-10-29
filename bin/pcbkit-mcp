@@ -1,0 +1,87 @@
+#!/bin/sh
+# PCBKit's MCP server on this computer (docs/adr/0069-the-plugin-runs-where-the-agent-runs.md):
+# `pcbkit mcp` on the project in the working directory, for agents that run next to the person's
+# files (Claude Code, Codex CLI, any stdio host). The `pcbkit` binary is the release this plugin
+# pins (VERSION below; a plugin update brings the next): PCBKIT_BIN if set, else `pcbkit` on the
+# PATH if it is that version, else the copy this launcher installed, else it downloads that
+# release from github.com/pcbkit-io/cli, checks it against the release's SHA256SUMS and keeps it
+# under ${PCBKIT_HOME:-~/.local/share/pcbkit}/cli/VERSION. When it cannot (no release yet, no
+# network, no build for this machine) it still answers the agent, as an MCP server whose one tool
+# says what happened and the line that installs PCBKit, so the agent can tell the person (a
+# server that exits shows only as "failed" in the host). Its notes go to stderr: stdout is the
+# MCP connection.
+set -eu
+VERSION=2026.10.29
+REPO=https://github.com/pcbkit-io/cli/releases/download/v$VERSION
+
+say() { printf 'pcbkit: %s\n' "$*" >&2; }
+
+# Answer the agent with `$1` (no quotes or backslashes in it) until the host closes the connection.
+fail() {
+  say "$1"
+  note="$1 Install it with: curl -fsSL https://pcbkit.io/install.sh | PCBKIT_VERSION=$VERSION sh (or set PCBKIT_BIN to a pcbkit binary), then restart the agent. Meanwhile PCBKit works on its servers: the connector https://mcp.pcbkit.io/mcp."
+  tool='{"name":"pcbkit_setup","description":"PCBKit is not installed on this computer: call this and tell the person what it says.","inputSchema":{"type":"object","properties":{}}}'
+  while IFS= read -r line; do
+    # The request's id: its last member (Claude Code) or before its params (most hosts).
+    id=$(printf '%s' "$line" | sed -nE 's/.*"id"[[:space:]]*:[[:space:]]*("[^"]*"|-?[0-9]+)[[:space:]]*}[[:space:]]*$/\1/p')
+    [ -n "$id" ] || id=$(printf '%s' "$line" | sed -E 's/"params".*//' | sed -nE 's/.*"id"[[:space:]]*:[[:space:]]*("[^"]*"|-?[0-9]+).*/\1/p')
+    [ -n "$id" ] || continue
+    case "$line" in
+      *'"initialize"'*) r='{"protocolVersion":"2025-06-18","capabilities":{"tools":{}},"serverInfo":{"name":"pcbkit","version":"'$VERSION'"},"instructions":"'$note'"}' ;;
+      *'"tools/list"'*) r='{"tools":['$tool']}' ;;
+      *'"tools/call"'*) r='{"content":[{"type":"text","text":"'$note'"}],"isError":true}' ;;
+      *'"ping"'*) r='{}' ;;
+      *) printf '{"jsonrpc":"2.0","id":%s,"error":{"code":-32601,"message":"%s"}}\n' "$id" "$note"; continue ;;
+    esac
+    printf '{"jsonrpc":"2.0","id":%s,"result":%s}\n' "$id" "$r"
+  done
+  exit 0
+}
+
+if [ -n "${PCBKIT_BIN:-}" ]; then exec "$PCBKIT_BIN" mcp "$@"; fi
+
+if command -v pcbkit >/dev/null 2>&1; then
+  case "$(pcbkit --version 2>/dev/null || true)" in
+    "pcbkit $VERSION "* | "pcbkit $VERSION") exec pcbkit mcp "$@" ;;
+  esac
+fi
+
+home=${PCBKIT_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/pcbkit}
+dir=$home/cli/$VERSION
+bin=$dir/bin/pcbkit
+if [ -x "$bin" ]; then exec "$bin" mcp "$@"; fi
+
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) target=aarch64-apple-darwin ;;
+  Darwin-x86_64) target=x86_64-apple-darwin ;;
+  Linux-aarch64 | Linux-arm64) target=aarch64-unknown-linux-gnu ;;
+  Linux-x86_64) target=x86_64-unknown-linux-gnu ;;
+  *) fail "PCBKit has no build for $(uname -s) $(uname -m)." ;;
+esac
+asset=pcbkit-$target.tar.gz
+
+fetch() {
+  if command -v curl >/dev/null 2>&1; then curl -fsSL --retry 2 -o "$2" "$1"
+  elif command -v wget >/dev/null 2>&1; then wget -q -O "$2" "$1"
+  else return 1; fi
+}
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1
+  else shasum -a 256 "$1" | cut -d' ' -f1; fi
+}
+
+say "installing PCBKit $VERSION ($target) into $dir, once"
+mkdir -p "$home/cli"
+tmp=$(mktemp -d "$home/cli/.install.XXXXXX")
+trap 'rm -rf "$tmp"' EXIT
+fetch "$REPO/$asset" "$tmp/$asset" || fail "PCBKit $VERSION could not be downloaded from $REPO/$asset (not released yet, or no network)."
+fetch "$REPO/SHA256SUMS" "$tmp/SHA256SUMS" || fail "PCBKit $VERSION could not be downloaded from $REPO/SHA256SUMS."
+want=$(awk -v a="$asset" '$2 == a || $2 == "*" a { print $1 }' "$tmp/SHA256SUMS")
+got=$(sha256 "$tmp/$asset")
+[ -n "$want" ] && [ "$want" = "$got" ] || fail "$asset does not match the release SHA256SUMS (got $got): not installed."
+mkdir -p "$tmp/tree"
+tar -xzf "$tmp/$asset" -C "$tmp/tree"
+[ -x "$tmp/tree/bin/pcbkit" ] || fail "$asset has no bin/pcbkit."
+# Another start may have finished first: keep the one there.
+mv "$tmp/tree" "$dir" 2>/dev/null || [ -x "$bin" ] || fail "could not install into $dir."
+exec "$bin" mcp "$@"

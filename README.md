@@ -13,49 +13,67 @@ edge", "make the power tracks wider") and it changes the board and routes it aga
 
 ## Install
 
-**Claude** (claude.ai, Cowork, the desktop app): add PCBKit from the directory.
-
-**Claude Code:**
+**Claude Code** (PCBKit runs on your computer, on the project in your working directory):
 
 ```sh
-claude plugin marketplace add pcbkit-io/plugins
-claude plugin install pcbkit@pcbkit
+claude plugin marketplace add pcbkit-io/plugins && claude plugin install pcbkit@pcbkit
 ```
 
-**ChatGPT:** add PCBKit from the apps and plugins directory. A workspace admin can also import this
-repository as a marketplace (Admin → Plugins → Import marketplace).
-
-**Codex:**
+**Codex CLI** (the same, on your computer):
 
 ```sh
-codex plugin marketplace add pcbkit-io/plugins
-codex plugin add pcbkit@pcbkit
+codex plugin marketplace add pcbkit-io/plugins && codex plugin add pcbkit@pcbkit
 ```
+
+**Cursor, VS Code, JetBrains, Gemini CLI and other agents**: install the CLI
+(`curl -fsSL https://pcbkit.io/install.sh | sh`) and add the MCP server `pcbkit mcp`; every host's
+line: [pcbkit.io/docs/agent-hosts](https://github.com/pcbkit-io/pcbkit/blob/main/docs/agent-hosts.md).
+
+**Claude** (claude.ai, the desktop and phone apps) and **ChatGPT**: add PCBKit from their
+directory. There PCBKit runs on its servers (`https://mcp.pcbkit.io/mcp`) and the board opens in
+the conversation as an interactive app.
 
 Then ask: "Make a board with an LED that blinks every 2 seconds."
 
-In Claude and ChatGPT the board opens in the conversation as an interactive app (PCBKit's own
-renderer, 2D and 3D): look at it, select and move parts, route it, play its tour, share it by link,
-or go fullscreen for the whole editor; the menu lists your boards and asks the assistant to fix
-what the check finds.
+## Where it runs
+
+**Claude Code and Codex: on your computer.** The plugin starts `pcbkit mcp`, PCBKit's command-line
+tool, on the project in the directory you work in: a KiCad project with a `.pcbkit/` folder (a new
+board starts there). Checking, placing, routing, analysis and exports run on your machine with all
+its cores, the files are written into your project (git keeps the history) and nothing is uploaded.
+The first `board.open` opens the board in your browser on app.pcbkit.io, attached to the files on
+your computer: it follows every change, yours in the page included (moving parts, routing: written
+into your files, routed on your machine), and shows what the agent is doing. The page reaches your
+computer through PCBKit's relay with everything sealed under a key that stays in the link (the
+relay cannot read it), so no port is opened on your machine and it works in every browser, also
+when the agent runs over SSH or in a container. The tools work offline, but for the board's page
+and what needs PCBKit's service, which they reach at pcbkit.io when asked: the parts catalogue's stock and prices, parts made from datasheets, share
+links, fab orders.
+
+The first start installs the `pcbkit` release this plugin pins from
+[github.com/pcbkit-io/cli](https://github.com/pcbkit-io/cli) (macOS, Linux; checked against the
+release's SHA-256 sums) into `~/.local/share/pcbkit/cli/<version>/`. `pcbkit` on your PATH at that
+version is used as it is; `PCBKIT_BIN` names another binary. Updating the plugin
+(`claude plugin update pcbkit@pcbkit`, `codex plugin add pcbkit@pcbkit`) brings the next release.
+Windows: install `pcbkit` from the releases and use it with an agent that runs in WSL or Git Bash.
+
+**Claude and ChatGPT: on PCBKit's servers.** The board's files and the requests you make through
+the tools are sent to `mcp.pcbkit.io`, where the boards are kept (one per conversation, more with
+`project.new`; signed-in boards with your account) and exports are kept as download links for 7
+days. No account is needed to start. See the [privacy policy](https://pcbkit.io/privacy) and the
+[terms](https://pcbkit.io/terms).
 
 ## What it contains
 
 One plugin for both agents; each reads its own manifest and both share the skills.
 
 - `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.mcp.json`: the plugin for
-  Claude and Claude Code.
-- `plugin.json`, `mcp.json`, `.agents/plugins/marketplace.json`: the plugin for ChatGPT and Codex.
-- Both connect to the PCBKit MCP server, `https://mcp.pcbkit.io/mcp` (remote, streamable HTTP).
+  Claude Code.
+- `.codex-plugin/plugin.json`, `mcp.json`, `.agents/plugins/marketplace.json`: the plugin for Codex.
+- `bin/pcbkit-mcp`: starts `pcbkit mcp`, installing the pinned release first if needed.
 - `skills/pcbkit-boards`: how to design, change, check, route and export a board with its tools.
 - `skills/setup`: introduces PCBKit and starts the first board.
 - `assets/`: the logo and icons.
-
-The plugin runs nothing on your computer. The tools run on PCBKit's servers: the board's files
-and the requests you make through the tools are sent to `mcp.pcbkit.io`, where the boards are kept
-(one per conversation, more with `project.new`; signed-in boards with your account) and exports are kept as download links
-for 7 days. No account is needed to start. See the [privacy policy](https://pcbkit.io/privacy) and
-the [terms](https://pcbkit.io/terms).
 
 ## Limits
 

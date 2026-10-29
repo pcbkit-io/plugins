@@ -2,13 +2,11 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
     "pcbkit": {
-      "type": "streamable-http",
-      "url": "https://mcp.pcbkit.io/mcp",
-      "extensions": {
-        "com.openai": {
-          "auth": { "type": "mixed", "client": { "mode": "dcr" } }
-        }
-      }
+      "command": "sh",
+      "args": ["./bin/pcbkit-mcp"],
+      "cwd": ".",
+      "startup_timeout_sec": 120,
+      "tool_timeout_sec": 900
     }
   }
 }
