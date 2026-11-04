@@ -12,7 +12,7 @@
 # server that exits shows only as "failed" in the host). Its notes go to stderr: stdout is the
 # MCP connection.
 set -eu
-VERSION=2026.11.4
+VERSION=2026.10.29
 REPO=https://github.com/pcbkit-io/cli/releases/download/v$VERSION
 
 say() { printf 'pcbkit: %s\n' "$*" >&2; }
