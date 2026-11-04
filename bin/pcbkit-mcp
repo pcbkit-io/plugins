@@ -1,6 +1,7 @@
 #!/bin/sh
 # PCBKit's MCP server on this computer (docs/adr/0069-the-plugin-runs-where-the-agent-runs.md):
-# `pcbkit mcp` on the project in the working directory, for agents that run next to the person's
+# `pcbkit mcp` on the project the host works in (never this plugin's directory, where hosts start
+# it: `Source::disk` in crates/pcbkit/src/mcp.rs), for agents that run next to the person's
 # files (Claude Code, Codex CLI, any stdio host). The `pcbkit` binary is the release this plugin
 # pins (VERSION below; a plugin update brings the next): PCBKIT_BIN if set, else `pcbkit` on the
 # PATH if it is that version, else the copy this launcher installed, else it downloads that
@@ -11,7 +12,7 @@
 # server that exits shows only as "failed" in the host). Its notes go to stderr: stdout is the
 # MCP connection.
 set -eu
-VERSION=2026.10.29
+VERSION=2026.11.4
 REPO=https://github.com/pcbkit-io/cli/releases/download/v$VERSION
 
 say() { printf 'pcbkit: %s\n' "$*" >&2; }

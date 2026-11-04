@@ -22,6 +22,8 @@ beside the MCU to keep its traces short"); what the call names (`id`, `ids`, `ne
 there. A tool lists its ops and their required fields; `help { command: "board.move" }` gives one
 op's whole input. `help { topic: "quickstart" }` has the practice every board follows (finish,
 power, sensors, numbers, connectors, devices, ordering): read it before the first design.
+PCBKit itself (a board about it, a pitch of it): `help { topic: "pcbkit" }` is what pcbkit.io
+says, with its pages' links, when the web does not open them.
 
 ## The loop
 
@@ -43,12 +45,17 @@ power, sensors, numbers, connectors, devices, ordering): read it before the firs
 2. **Write the whole first design in one call:** `help { topic: "quickstart" }` (a complete board,
    every block and registry part), then `help.describe { ids: [...] }` for the blocks and
    `parts.use { ids: [...] }` for the chips you use (one call each; `parts.use` answers the
-   design's text: no need to read it), then
+   design's text: no need to read it); a device gets real parts the fab stocks: the others in one
+   `parts.search { queries: [...] }`, each a part number or a function with what it must meet
+   (`LDO 3.3V 500mA`, `SMD buzzer 3V`, `2 inch TFT`), whose summary names the best hit and the call
+   that takes it (`parts.use`, or `parts.create { make: "<code>" }` for a stocked row we lack; a
+   ready-made module on sockets only when the person wants one), then
    `design.write { path: ".pcbkit/design.pcbkit", text, build: true }`: blocks and parts joined by
    nets, no coordinates. `build: true` places, routes and checks in the same call.
-3. **Open it:** `board.open` once per conversation, right after the first design; it follows every
-   later change by itself, the person's included. Where the host draws no board (Codex, Claude
-   Code), its answer is the live page's link: give it in your answer, once. Never call it again.
+3. **Open it:** where the host draws no board (Codex, Claude Code), the first build's answer has
+   the board's live link: give it in your answer, once; no `board.open`. Elsewhere `board.open`
+   once, right after the first design. The board follows every later change by itself, the
+   person's included. Never open it again.
 4. **Fix** what the build's answer spells out with `design.edit { …, build: true }` (one call
    changes and builds; `design.check` only when it says there are more). A build keeps the copper that
    still matches and routes only what is new or broken. The engine's own placement and copper
@@ -57,15 +64,17 @@ power, sensors, numbers, connectors, devices, ordering): read it before the firs
    (`soft(…)`, a named zone such as `area(.bottom)` instead of a box of coordinates, fewer `far`s)
    and build again. `design.diagnose { id: "GND" }` says why a connection does not fit and the one
    thing to do.
-5. **Celebrate** the first complete check with `board.tour` (a short camera tour, once per board),
-   and make it orderable: `parts.select {}` picks a real, stocked part for every component (the
-   board is not ready for a factory without them); name the parts it could not find and fix them
-   (`parts.alternatives { id }`, `parts.select { pin }`) before calling the board ready.
+5. **Stop at `decided`.** A build whose `Next:` starts with `decided` is done: it chose a real,
+   stocked part for every component, ran the review (the ready analysis) and checked everything a
+   tool can check. Calling `parts.select`, `analysis.run`, `design.check`, `board.snapshot` or
+   `board.tour` after it only repeats what the build did: answer the person instead. Short of
+   `decided`, its `Next:` names each decision left (a part no stock meets, a wish's number to bind,
+   a processor's program): make them in one `design.edit { …, build: true }` where you can.
 6. **Report in a sentence or two**, in plain words, by the board's name, never with ids: the numbers
-   that matter (size, a blinker's on and off times) and what you saw (`board.snapshot {}` once per
-   turn after parts moved). A complete check is not the review: name what
-   `analysis.run { lens: "ready" }` still has to fix or to consider. Offer two or three next steps (`help { topic: "guide" }` has the
-   ladder: make it theirs, move things, add features, make it sturdy, grow it, order it).
+   that matter (size, a blinker's on and off times), the defaults you chose and the findings the
+   build left unconfirmed. Offer two or three next steps (`help { topic: "guide" }` has the ladder:
+   make it theirs, move things, add features, make it sturdy, grow it, order it); a camera tour of
+   the board (`board.tour`) when the person wants one.
 7. **Each further request is one small change** with `build: true` (`design.edit`, `board.move`,
    `board.set`, …) and the same short report. The view goes to what you changed by itself; to show
    something else, `board.camera { ids }`; what the person asks to see, `board.look { view, layers, theme, panel }` and the other `view` ops do.
