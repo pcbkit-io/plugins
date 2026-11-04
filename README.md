@@ -25,7 +25,7 @@ claude plugin marketplace add pcbkit-io/plugins && claude plugin install pcbkit@
 codex plugin marketplace add pcbkit-io/plugins && codex plugin add pcbkit@pcbkit
 ```
 
-Then start the agent in your KiCad project's folder, or in an empty folder for a new board
+Then start the agent in your board's folder (a KiCad board there is imported), or in an empty folder for a new board
 (`mkdir blinker && cd blinker && claude`, or `codex`). Claude Code asks before each PCBKit tool
 the first time ("Yes, and don't ask again"; or allow them all at once: `"permissions": { "allow":
 ["mcp__plugin_pcbkit_pcbkit"] }` in `.claude/settings.json`). Codex runs PCBKit's tools without
@@ -46,7 +46,7 @@ Then ask: "Make a board with an LED that blinks every 2 seconds."
 ## Where it runs
 
 **Claude Code and Codex: on your computer.** The plugin starts `pcbkit mcp`, PCBKit's command-line
-tool, on the project in the directory you work in: a KiCad project with a `.pcbkit/` folder (a new
+tool, on the project in the directory you work in: its `.pcbkit/` folder of PCBKit files (a new
 board starts there). Checking, placing, routing, analysis and exports run on your machine with all
 its cores, the files are written into your project (git keeps the history) and nothing is uploaded.
 The first `board.open` opens the board in your browser on app.pcbkit.io, attached to the files on
