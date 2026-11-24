@@ -24,8 +24,10 @@ from where you were. Do not try to do the work without the tools.
   brings it in whole.
 - A KiCad project in this folder that is not on GitHub: make a project, then put its files in
   with `write`, each as it is (the `.kicad_pro`, `.kicad_sch`, `.kicad_pcb`, its own libraries).
-- Call `open` as soon as there is something to see and give the person its link: they follow
-  every step there.
+- Right after the project is made, before any other work, call `open` and give the person its
+  link in a line of its own: from a terminal that page is their only window on the device, and
+  it follows every step as you take it. Say again where to look when the schematic is drawn
+  and when the board is placed and routed.
 
 ## While working
 

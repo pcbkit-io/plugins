@@ -52,7 +52,84 @@
         "logo": "./assets/logo.png",
         "logoDark": "./assets/logo-dark.png"
       },
-      "onboardingSkill": "./skills/design/SKILL.md"
+      "onboardingSkill": "./skills/design/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "A new device from one sentence",
+              "prompt": "Design a small USB-C night light with three white LEDs that turn on in the dark, and show it to me.",
+              "tools_triggered": [
+                "new_project",
+                "open",
+                "guide",
+                "parts",
+                "draw",
+                "check"
+              ],
+              "expected_behavior": "Makes a project, opens the editor and gives its link, chooses real parts, draws the schematic and reports what KiCad's electrical check found."
+            },
+            {
+              "description": "Reviewing a KiCad project from GitHub",
+              "prompt": "Open the KiCad project at https://github.com/DoImant/TP4056 and tell me if the board is safe to order.",
+              "tools_triggered": [
+                "new_project",
+                "check",
+                "nets",
+                "look"
+              ],
+              "expected_behavior": "Brings the repository in as a project, runs KiCad's design-rule and electrical checks, and says what was verified, what it found and what is assumed."
+            },
+            {
+              "description": "Choosing a real part",
+              "prompt": "Find me a 3.3 V regulator that is in stock, gives at least 500 mA from a USB supply, and comes in a small package.",
+              "tools_triggered": [
+                "parts",
+                "part"
+              ],
+              "expected_behavior": "Searches the parts library, compares a few candidates with their stock and prices, and recommends one with its part number, package and the datasheet's figures."
+            },
+            {
+              "description": "Changing a board that exists",
+              "prompt": "In my night light, make the power tracks 0.5 mm wide, route the board again and check it.",
+              "tools_triggered": [
+                "projects",
+                "status",
+                "rules",
+                "route",
+                "check"
+              ],
+              "expected_behavior": "Finds the project, sets the supply nets' width in the board's rules, routes it again, and reports the check's result."
+            },
+            {
+              "description": "The files for a factory",
+              "prompt": "Give me the files to order my night light at JLCPCB.",
+              "tools_triggered": [
+                "projects",
+                "check",
+                "fab",
+                "download"
+              ],
+              "expected_behavior": "Checks the board, makes the Gerbers, the bill of materials and the placement list, and gives a link to download them, saying what the person should review before ordering."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Not about hardware",
+              "prompt": "What is the weather in Paris this weekend?"
+            },
+            {
+              "description": "Software, not a device",
+              "prompt": "Write a Python script that sorts a CSV file by its second column."
+            },
+            {
+              "description": "Design of another kind",
+              "prompt": "Design a logo for my coffee shop."
+            }
+          ]
+        },
+        "commerce": false
+      }
     }
   }
 }
