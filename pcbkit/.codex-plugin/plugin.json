@@ -20,7 +20,7 @@
     "gerber"
   ],
   "skills": "./skills/",
-  "mcpServers": "./mcp.json",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "PCBKit",
     "shortDescription": "Design electronic devices",

@@ -43,6 +43,23 @@ connectors, or as a custom connector with the address below.
   export a device, and a guide your agent reads as it works.
 - A short skill that tells your agent when PCBKit is the right tool and how to start.
 
+## What is where
+
+- `pcbkit/` is the plugin Claude Code and Codex install from this repository: Claude Code
+  reads `.claude-plugin/plugin.json`, Codex `.codex-plugin/plugin.json`, both the server's
+  address in `.mcp.json` and the skill in `skills/`.
+- `openai/` holds the two manifests OpenAI's directory takes (`plugin.json` with the listing,
+  `mcp.json` with how the server is signed in to). They are kept out of `pcbkit/` on purpose:
+  with a portable `plugin.json` at its root Codex gives its model only as many of a plugin's
+  tools as fit 64,000 bytes ([openai/codex#44308](https://github.com/openai/codex/issues/44308)),
+  and PCBKit has more. The package for the directory is `pcbkit/` with those two files at its
+  root:
+
+  ```
+  (cd pcbkit && zip -r ../pcbkit-openai.zip assets skills icon.png README.md LICENSE)
+  (cd openai && zip ../pcbkit-openai.zip plugin.json mcp.json)
+  ```
+
 ## License
 
 MIT. PCBKit itself is a service: <https://pcbkit.io/terms>.
