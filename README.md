@@ -20,6 +20,18 @@ Then ask for a device:
 The first time, your agent asks you to sign in to PCBKit: run `/mcp`, choose
 `plugin:pcbkit:pcbkit`, and follow the link.
 
+**Codex** (the CLI, or Codex in the ChatGPT desktop app)
+
+```
+codex plugin marketplace add pcbkit-io/plugins
+```
+
+then install PCBKit from `/plugins`, start a new session, and sign in when Codex asks
+(`codex mcp login pcbkit`).
+
+**ChatGPT and Claude** (the apps): add PCBKit from the app's directory of plugins and
+connectors, or as a custom connector with the address below.
+
 **Any other agent** that speaks MCP can use PCBKit without a plugin: add the server
 `https://mcp.pcbkit.io/mcp` (streamable HTTP, sign-in by OAuth).
 

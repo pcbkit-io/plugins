@@ -1,0 +1,54 @@
+{
+  "name": "pcbkit",
+  "version": "3.0.0",
+  "description": "Design electronic devices with your agent: circuit boards as KiCad projects, real parts, checks, routing, a case, and the files a factory needs, shown live in your browser.",
+  "author": {
+    "name": "PCBKit",
+    "email": "support@pcbkit.io",
+    "url": "https://pcbkit.io"
+  },
+  "homepage": "https://pcbkit.io",
+  "repository": "https://github.com/pcbkit-io/plugins",
+  "license": "MIT",
+  "keywords": [
+    "pcb",
+    "kicad",
+    "electronics",
+    "hardware",
+    "schematic",
+    "autorouter",
+    "gerber"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json",
+  "interface": {
+    "displayName": "PCBKit",
+    "shortDescription": "Design electronic devices",
+    "longDescription": "PCBKit designs electronic devices with you. Describe what you want to build (\"a USB-C powered ESP32 weather station with a display\") and it chooses real parts that are in stock, draws the schematic, lays out and routes the circuit board, checks it with KiCad's own electrical and design rules, and makes the files a factory needs: Gerbers, the bill of materials and the placement list. It can also design a printed case round the board.\n\nEvery device is a project in your PCBKit account, kept as ordinary KiCad files, and you watch each step live in PCBKit's editor: the schematic, the board in 2D, the finished device in 3D. Ask for changes in plain words (\"move the connector to the left edge\", \"make the power tracks wider\", \"use a part JLCPCB has in stock\") and the device is changed and checked again. You can bring in a KiCad project from a public GitHub repository, review a board before ordering it, and download every file.\n\nWho it is for: makers, students and engineers who want a board made, from a first blinker to a product's prototype.\n\nLimits: you sign in with a free PCBKit account. Review every design before you order it: PCBKit says what it verified and what it assumed, and a person is responsible for the order. Very dense or high-speed boards may not route completely, and PCBKit names the connections that are missing. Mains-powered and safety-critical designs need a qualified engineer.",
+    "developerName": "PCBKit",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Design a circuit board from a description",
+      "Choose real parts with stock and prices",
+      "Draw and check the schematic",
+      "Place, route and check the board",
+      "Review a KiCad project before ordering",
+      "Make Gerbers, the BOM and the placement list",
+      "Design a printed case round the board"
+    ],
+    "websiteURL": "https://pcbkit.io",
+    "supportURL": "https://pcbkit.io/support",
+    "privacyPolicyURL": "https://pcbkit.io/privacy",
+    "termsOfServiceURL": "https://pcbkit.io/terms",
+    "defaultPrompt": [
+      "Design a USB-C powered ESP32 weather station and show it to me.",
+      "Open my KiCad project from GitHub and tell me if it is safe to order.",
+      "Make a 555 LED blinker I can solder by hand, with the files for JLCPCB."
+    ],
+    "brandColor": "#0A5BF0",
+    "brandColorDark": "#4C8DFF",
+    "composerIcon": "./assets/composer-icon.svg",
+    "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo-dark.png"
+  }
+}
