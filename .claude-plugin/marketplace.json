@@ -1,0 +1,20 @@
+{
+  "name": "pcbkit",
+  "owner": {
+    "name": "PCBKit",
+    "email": "support@pcbkit.io",
+    "url": "https://pcbkit.io"
+  },
+  "metadata": {
+    "description": "PCBKit for agents: design electronic devices, from a sentence to the files a factory needs."
+  },
+  "plugins": [
+    {
+      "name": "pcbkit",
+      "source": "./pcbkit",
+      "description": "Design electronic devices with your agent: circuit boards as KiCad projects, real parts, checks, routing, a case, and the files a factory needs, shown live in your browser.",
+      "version": "3.0.0",
+      "category": "development"
+    }
+  ]
+}

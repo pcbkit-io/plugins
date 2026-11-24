@@ -1,0 +1,20 @@
+{
+  "name": "pcbkit",
+  "displayName": "PCBKit",
+  "version": "3.0.0",
+  "description": "Design electronic devices with your agent: circuit boards as KiCad projects, real parts, checks, routing, a case, and the files a factory needs, shown live in your browser.",
+  "author": {
+    "name": "PCBKit",
+    "email": "support@pcbkit.io",
+    "url": "https://pcbkit.io"
+  },
+  "homepage": "https://pcbkit.io",
+  "repository": "https://github.com/pcbkit-io/plugins",
+  "license": "MIT",
+  "keywords": ["pcb", "kicad", "electronics", "hardware", "schematic", "autorouter", "gerber"],
+  "icon": "./icon.png",
+  "documentationUrl": "https://github.com/pcbkit-io/plugins#readme",
+  "supportUrl": "https://pcbkit.io/support",
+  "privacyPolicyUrl": "https://pcbkit.io/privacy",
+  "termsOfServiceUrl": "https://pcbkit.io/terms"
+}

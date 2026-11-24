@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pcbkit": {
+      "type": "http",
+      "url": "https://mcp.pcbkit.io/mcp"
+    }
+  }
+}
