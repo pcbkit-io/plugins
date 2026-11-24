@@ -24,10 +24,12 @@ The first time, your agent asks you to sign in to PCBKit: run `/mcp`, choose
 
 ```
 codex plugin marketplace add pcbkit-io/plugins
+codex plugin add pcbkit@pcbkit
+codex mcp login pcbkit
 ```
 
-then install PCBKit from `/plugins`, start a new session, and sign in when Codex asks
-(`codex mcp login pcbkit`).
+The last line signs you in to PCBKit in your browser. Then start a new session and ask for a
+device. The plugin browser (`/plugins`) installs it too.
 
 **ChatGPT and Claude** (the apps): add PCBKit from the app's directory of plugins and
 connectors, or as a custom connector with the address below.

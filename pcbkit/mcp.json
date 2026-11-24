@@ -3,17 +3,7 @@
   "mcpServers": {
     "pcbkit": {
       "type": "streamable-http",
-      "url": "https://mcp.pcbkit.io/mcp",
-      "extensions": {
-        "com.openai": {
-          "auth": {
-            "type": "oauth",
-            "client": {
-              "mode": "dcr"
-            }
-          }
-        }
-      }
+      "url": "https://mcp.pcbkit.io/mcp"
     }
   }
 }
