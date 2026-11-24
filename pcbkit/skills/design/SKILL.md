@@ -12,9 +12,11 @@ tool for each step): follow those. This page is only what is particular to worki
 
 ## Before the first call
 
-If PCBKit's tools are not among yours, or a call says the person must sign in, ask them to run
-`/mcp`, choose `plugin:pcbkit:pcbkit` and sign in (a free account, in the browser), then go on
-from where you were. Do not try to do the work without the tools.
+If PCBKit's tools are not among yours, or a call says the person must sign in, ask them to
+sign in to PCBKit (a free account, in the browser) and go on from where you were once they
+have. How they sign in depends on where you run: in Claude Code, `/mcp`, then
+`plugin:pcbkit:pcbkit`; in Codex, `codex mcp login pcbkit` or the plugin's page in `/plugins`;
+in ChatGPT and Claude, the app asks by itself. Do not try to do the work without the tools.
 
 ## Starting
 

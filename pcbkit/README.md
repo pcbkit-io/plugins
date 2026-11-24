@@ -22,7 +22,8 @@ every step live in your browser.
 
 Each device is a project on [PCBKit](https://pcbkit.io), kept in a computer of its own with
 KiCad 10 and PCBKit's tools. The first time your agent uses PCBKit you sign in with a free
-account: run `/mcp`, choose `plugin:pcbkit:pcbkit`, and follow the link.
+account, in your browser: in Claude Code run `/mcp` and choose `plugin:pcbkit:pcbkit`; in
+Codex run `codex mcp login pcbkit`; ChatGPT and Claude ask by themselves.
 
 Your projects are ordinary KiCad files. Ask your agent to bring them into your folder whenever
 you want them.
